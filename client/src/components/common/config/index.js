@@ -1,3 +1,4 @@
+
 export const registerFormControls =[
   {
     name:'userName',
@@ -38,3 +39,27 @@ export const loginFormControls =[
     type:'password'
   }
 ]
+
+export const adminDashboardMenu = [
+  {
+    id: 'dashboard',
+    name: 'Dashboard',
+    icon: 'BookDashed', // Store the name of the Lucide icon
+    link: '/admin/dashboard',
+    
+  },
+  {
+    id: 'products',
+    name: 'Products',
+    icon: 'Shirt',
+    link: '/admin/products',
+    
+  },
+  {
+    id: 'orders',
+    name: 'Orders',
+    icon: 'ListOrdered',
+    link: '/admin/orders',
+    
+  },
+];

@@ -1,7 +1,8 @@
 
 const bcrypt = require('bcryptjs')
 const jwt =require('jsonwebtoken')
-const Users = require('../../models/user')
+const Users = require('../../models/user');
+const { json } = require('express');
 
 
 //register
@@ -102,11 +103,44 @@ const loginUser = async(req, res)=>{
 
 
 
-//logout
+//logoutUserlogOutUser
 
+// const logOutUser =(req,res)=>{
+//   res.clearCookie('token').json({
+//     success:true,
+//     message:"Logged out successfully"
+//   })
+// }
+
+const logOutUser = (req, res) => {
+  // Clear the 'token' cookie and ensure the path matches where the cookie was set
+  res.clearCookie('token', { httpOnly: true, secure: false });
+
+  // Send a success response
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
 
   //auth middleware
+const authMiddleware =async(req,res,next)=>{
+  const token = req.cookies.token;
+  if(!token) return res.json({
+    success:false,
+    message:"Please login first"
+  })
+  try {
+    const tokenDecode= jwt.verify(token,process.env.SECRET_KEY);
+      req.user = tokenDecode;
+      next();
+  } catch (error) {
+    res.status(401).json({
+      success:false,
+      message:"UnAuthorised User!"
+    })
+  }
+}
 
 
-
-  module.exports={registerUser,loginUser}
+  module.exports={registerUser,loginUser,logOutUser,authMiddleware}
