@@ -57,7 +57,7 @@ export const checkAuth = createAsyncThunk('/auth/checkauth', async (formData, { 
       },
 
     );
-    console.log(response)
+    // console.log(response)
     return response.data;
   } catch (error) {
     // Use rejectWithValue to return custom error message
@@ -71,7 +71,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action) => { }
+    // setUser: (state, action) => { }
   },
   extraReducers: (builder) => {
     builder.addCase(registerUser.pending, state => {
