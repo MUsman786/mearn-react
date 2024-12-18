@@ -1,9 +1,9 @@
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Select, SelectContent, SelectTrigger, SelectValue } from "../ui/select";
+import { Select, SelectContent, SelectTrigger, SelectValue,SelectItem } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 
-export default function CommonForm({formControls,formData,setFormData,onSubmit,buttonText}) {
+export default function CommonForm({formControls,isFormValidate,formData,setFormData,onSubmit,buttonText}) {
   function renderInputComponentType(getControlItem){
     // debugger
     let element =null;
@@ -29,13 +29,14 @@ export default function CommonForm({formControls,formData,setFormData,onSubmit,b
               [getControlItem.name]: value
             })}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={getControlItem.placeholder}/>
+                <SelectValue placeholder={getControlItem.label}/>
               </SelectTrigger>
               <SelectContent>
+                {/* {console.log(getControlItem.options)} */}
                 {getControlItem.options && getControlItem.options.length>0?
-                getControlItem.map(itemOption=><SelectValue key={itemOption.id} value={itemOption.id}>
+                getControlItem.options.map(itemOption=><SelectItem key={itemOption.id} value={itemOption.id}>
                   {itemOption.label}
-                </SelectValue>):null}
+                </SelectItem>):null}
               </SelectContent>
             </Select>
           )
@@ -82,7 +83,7 @@ export default function CommonForm({formControls,formData,setFormData,onSubmit,b
 
         
       </div>
-      <Button className="mt-3 w-full" type="submit">{buttonText || 'Submit'}</Button>
+      <Button className="mt-3 w-full" type="submit" disabled={isFormValidate}>{buttonText || 'Submit'}</Button>
     </form>
   )
 }

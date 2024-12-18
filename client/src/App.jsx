@@ -15,16 +15,25 @@ import ShoppingCheckout from './pages/shopping-view/checkout'
 import ShoppingAccount from './pages/shopping-view/account'
 import CheckAuth from './components/common/check-auth'
 import UnauthPage from './pages'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { checkAuth } from './store/auth-slice'
+import { Skeleton } from './components/ui/skeleton'
 
 function App() {
   // const isAuthenticated =true
   // const user = {name:"usman",role:'user'}
-  const {isAuthenticated,user}= useSelector(state=>state.auth)
+  const {isAuthenticated,user,isLoading}= useSelector(state=>state.auth)
+  const dispatch =useDispatch()
+  useEffect(() => {
+    
+   dispatch(checkAuth())
+  }, [dispatch])
   return (
+    isLoading? <Skeleton className="w-[600px] h-[600px] " />    :
     <div className='fex flex-col overflow-hidden bg-white '>
       {/* common Component */}
-      <h1>Header Component</h1>
+      {/* <h1>Header Component</h1> */}
       <Routes>
         <Route path="/auth" element={
           <CheckAuth isAuthenticated={isAuthenticated} user={user}>
