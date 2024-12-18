@@ -78,7 +78,7 @@ const loginUser = async(req, res)=>{
       success: false,
       message:"Invalid password. Please try again"
     })
-    const token = jwt.sign({id:checkUser._id,email:checkUser.email,role:checkUser.role},process.env.SECRET_KEY,{expiresIn:'60m'})
+    const token = jwt.sign({id:checkUser._id,name:checkUser.userName,email:checkUser.email,role:checkUser.role},process.env.SECRET_KEY,{expiresIn:'60m'})
     res.cookie('token',token,{http:true,secure:false}).json({
       success:true,
       message:"Logged in successfully",

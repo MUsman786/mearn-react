@@ -21,11 +21,11 @@ export const registerUser = createAsyncThunk('/auth/register', async (formData, 
   // console.log(response.data)
   // return response.data;
 })
-export const logOutUser = createAsyncThunk('/auth/logout', async (formData, { rejectWithValue }) => {
+export const logOutUser = createAsyncThunk('/auth/logout', async (_, { rejectWithValue }) => {
   try {
     const response = await axios.post(
       'http://localhost:8000/api/auth/logout',
-      formData,
+      _,
       { withCredentials: true }
     );
     return response.data;
