@@ -19,10 +19,12 @@ import {
 import ShopingProductTile from "@/components/shopping-view/product-tile";
 import { useSearchParams } from "react-router-dom";
 import ProductDetailsDailog from "@/components/shopping-view/product-detail";
+import { addCartItem, getCartItem } from "@/store/shop/cart-slice";
+import { toast } from "@/hooks/use-toast";
 
 export default function ShoppingList() {
   const dispatch = useDispatch();
-
+  const { user } = useSelector((state) => state.auth);
   const { productList, productDetail } = useSelector(
     (state) => state.shopProduct
   );
@@ -30,6 +32,19 @@ export default function ShoppingList() {
   const [searchParems, setSearchParems] = useSearchParams();
   const [sort, setSort] = useState("price-lowtohigh");
   const [openDetailDilog, setOpenDetailDilog] = useState(false);
+
+  const handelCardProduct = (productId) => {
+    dispatch(addCartItem({ userId: user?.id, productId, quantity: 1 })).then(
+      (data) => {
+        if (data.payload.success) {
+          dispatch(getCartItem(user?.id));
+          toast({
+            description: "Product Add Successfully",
+          });
+        }
+      }
+    );
+  };
 
   const createSearcHParemsHelper = (filter) => {
     const queryParems = [];
@@ -39,50 +54,42 @@ export default function ShoppingList() {
         queryParems.push(`${key}=${encodeURIComponent(paremValue)}`);
       }
     }
-    // console.log(queryParems.join("&"));
-
     return queryParems.join("&");
   };
 
   useEffect(() => {
-    // Only call fetchAllFilteredProducts if filter or sort has actual data
     if (Object.keys(filter).length > 0 || sort) {
       dispatch(
         fetchAllFilteredProducts({ filterParams: filter, sortParams: sort })
       );
     }
-  }, [dispatch, filter, sort]); // Runs when filter or sort changes
+  }, [dispatch, filter, sort]);
 
   useEffect(() => {
     const storedFilter = sessionStorage.getItem("filter");
     if (storedFilter) {
       setFilter(JSON.parse(storedFilter));
     }
-  }, []); // Runs only on component mount (empty dependency array)
+  }, []);
+
   useEffect(() => {
     if (productDetail && productDetail._id) {
-      setOpenDetailDilog(true); // Open the dialog only when productDetail is ready
+      setOpenDetailDilog(true);
     }
   }, [productDetail]);
+
   useEffect(() => {
     if (filter && Object.keys(filter).length > 0) {
       const serchQueryString = createSearcHParemsHelper(filter);
       setSearchParems(new URLSearchParams(serchQueryString));
     }
   }, [filter]);
+
   const handleFilter = (getSectionId, getCurrentOption) => {
-    // console.log(getSectionId, getCurrentOption);
     let copyFilter = { ...filter };
-    // const indexOfCurrentSection = Object.keys(copyFilter).indexOf(getSectionId);
     if (!copyFilter[getSectionId]) {
       copyFilter[getSectionId] = [];
     }
-    // if (indexOfCurrentSection === -1) {
-    //   copyFilter = {
-    //     ...copyFilter,
-    //     [getSectionId]: [getCurrentOption],
-    //   };
-    // } else {
     const indexOfCurrentOption =
       copyFilter[getSectionId].indexOf(getCurrentOption);
     if (indexOfCurrentOption === -1) {
@@ -90,21 +97,17 @@ export default function ShoppingList() {
     } else {
       copyFilter[getSectionId].splice(indexOfCurrentOption, 1);
     }
-    // }
     setFilter(copyFilter);
-    // sessionStorage.setItem("filter", JSON.stringify(filter));
     sessionStorage.setItem("filter", JSON.stringify(copyFilter));
-    // console.log(filter, copyFilter);
   };
+
   const handelProductDetail = (id) => {
     dispatch(fetchSingleProduct(id));
-    // setOpenDetailDilog(true);
-    // console.log(productDetail, id, "productDetail");
   };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
       <ProductFilter filter={filter} handleFilter={handleFilter} />
-      {/* {console.log(filter, "dddddddd")} */}
       <div className="bg-background w-full rounded-lg shadow-sm">
         <div className="p-4 border-b flex items-center justify-between">
           <h2 className="font-extrabold text-lg">All Products</h2>
@@ -147,6 +150,7 @@ export default function ShoppingList() {
               product={item}
               key={item._id}
               handelProductDetail={handelProductDetail}
+              handelCardProduct={handelCardProduct}
             />
           ))}
         </div>

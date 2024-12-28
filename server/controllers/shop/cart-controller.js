@@ -65,7 +65,7 @@ const fetchCart = async (req, res) => {
     }
     const cart = await Cart.findOne({ userId }).populate({
       path: "items.productId",
-      select: "title price image salePrice ",
+      select: "title price image salePrice",
     });
     if (!cart) {
       return res.status(404).json({
@@ -78,9 +78,17 @@ const fetchCart = async (req, res) => {
       cart.items = validItems;
       await cart.save();
     }
+    const cartItems = cart.items.map((item) => ({
+      productId: item.productId._id,
+      title: item.productId.title,
+      price: item.productId.price,
+      image: item.productId.image,
+      salePrice: item.productId.salePrice,
+      quantity: item.quantity,
+    }));
     res.status(200).json({
       success: true,
-      data: cart,
+      data: { userId: cart.userId, items: cartItems },
     });
   } catch (error) {
     console.log(error);
@@ -154,10 +162,18 @@ const deletCartItems = async (req, res) => {
     );
     cart.items = itemIndex;
     await cart.save();
+    const cartItems = cart.items.map((item) => ({
+      productId: item.productId._id,
+      title: item.productId.title,
+      price: item.productId.price,
+      image: item.productId.image,
+      salePrice: item.productId.salePrice,
+      quantity: item.quantity,
+    }));
     res.status(200).json({
       success: true,
       message: "Product removed from Cart",
-      data: cart,
+      data: { userId: cart.userId, items: cartItems },
     });
   } catch (error) {
     console.log(error);

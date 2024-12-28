@@ -8,7 +8,7 @@ const initialState = {
 
 export const getCartItem = createAsyncThunk(
   "/shop/cart/getCartItem",
-  async ({ userId }) => {
+  async (userId) => {
     const response = await axios.get(
       `http://localhost:8000/api/shop/cart/get/${userId}`
     );
@@ -43,7 +43,7 @@ export const deletCartItems = createAsyncThunk(
   "/shop/cart/deletCartItems",
   async ({ userId, productId }) => {
     const response = await axios.delete(
-      `http://localhost:8000/api/shop/cart/add/${userId}/${productId}`
+      `http://localhost:8000/api/shop/cart/${userId}/${productId}`
     );
     return response.data;
   }
