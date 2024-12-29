@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   SheetContent,
   SheetDescription,
@@ -22,6 +22,14 @@ export default function UserCartWrapper({ cart }) {
   const { isLoading } = useSelector((state) => state.cartItems);
   // const loading = useSelector(selectCartLoading);
   console.log(isLoading);
+
+  const totalAmount = useMemo(() => {
+    return cart.reduce((total, item) => {
+      const itemTotal =
+        (item.salePrice ? item.salePrice : item.price) * item.quantity;
+      return total + itemTotal;
+    }, 0);
+  }, [cart]);
 
   const handleCartItem = (item, type) => {
     const quantity =
@@ -82,7 +90,7 @@ export default function UserCartWrapper({ cart }) {
           {/* <Separator className="space-y-4 my-5" /> */}
           <div className="mt-8 space-y-4 flex justify-between">
             <span className="font-bold">Total</span>
-            <span className="font-bold">$1000</span>
+            <span className="font-bold">${totalAmount.toFixed(2)}</span>
           </div>
           <Button className="w-full mt-5">Checkout</Button>
         </>
