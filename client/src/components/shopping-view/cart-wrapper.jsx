@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   SheetContent,
   SheetDescription,
@@ -19,10 +19,11 @@ import { toast } from "@/hooks/use-toast";
 export default function UserCartWrapper({ cart }) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const [loading, setLoading] = useState(false);
+  const { isLoading } = useSelector((state) => state.cartItems);
+  // const loading = useSelector(selectCartLoading);
+  console.log(isLoading);
 
   const handleCartItem = (item, type) => {
-    setLoading(true);
     const quantity =
       type === "increase" ? item.quantity + 1 : item.quantity - 1;
     dispatch(
@@ -36,16 +37,12 @@ export default function UserCartWrapper({ cart }) {
         toast({
           description: "Cart Updated Successfully",
         });
-        dispatch(getCartItem(user?.id)).then(() => {
-          setLoading(false);
-        });
-      } else {
-        setLoading(false);
+        dispatch(getCartItem(user?.id));
       }
     });
   };
+
   const deleteCart = (item) => {
-    setLoading(true);
     dispatch(
       deletCartItems({ userId: user?.id, productId: item?.productId })
     ).then((data) => {
@@ -53,21 +50,18 @@ export default function UserCartWrapper({ cart }) {
         toast({
           description: "Product Deleted Successfully",
         });
-        dispatch(getCartItem(user?.id)).then(() => {
-          setLoading(false);
-        });
-      } else {
-        setLoading(false);
+        dispatch(getCartItem(user?.id));
       }
     });
   };
+
   return (
     <SheetContent className="max-w-sm overflow-auto">
       <SheetHeader>
         <SheetTitle>Cart</SheetTitle>
       </SheetHeader>
       <SheetDescription />
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <span>Loading...</span>
         </div>
