@@ -1,10 +1,16 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { deletCartItems, getCartItem } from "@/store/shop/cart-slice";
+import {
+  addCartItem,
+  deletCartItems,
+  getCartItem,
+  UpdatedCartItem,
+} from "@/store/shop/cart-slice";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "@/hooks/use-toast";
 
-export default function UserCartItemsContent({ item }) {
+export default function UserCartItemsContent({ item, handleCartItem }) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const totalPrice =
@@ -15,6 +21,9 @@ export default function UserCartItemsContent({ item }) {
       deletCartItems({ userId: user?.id, productId: item?.productId })
     ).then((data) => {
       if (data.payload.success) {
+        toast({
+          description: "Product Deleted Successfully",
+        });
         dispatch(getCartItem(user?.id));
       }
     });
@@ -34,6 +43,8 @@ export default function UserCartItemsContent({ item }) {
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full"
+            disabled={item.quantity === 1}
+            onClick={() => handleCartItem(item, "decrease")}
           >
             <Minus className="h-4 w-4" />
             <span className="sr-only">Decrease</span>
@@ -43,6 +54,7 @@ export default function UserCartItemsContent({ item }) {
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full"
+            onClick={() => handleCartItem(item, "increase")}
           >
             <Plus className="h-4 w-4" />
             <span className="sr-only">Increase</span>

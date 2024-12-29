@@ -8,8 +8,31 @@ import {
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import UserCartItemsContent from "./cart-items-content";
+import { useDispatch, useSelector } from "react-redux";
+import { getCartItem, UpdatedCartItem } from "@/store/shop/cart-slice";
+import { toast } from "@/hooks/use-toast";
 
 export default function UserCartWrapper({ cart }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const handleCartItem = (item, type) => {
+    const quantity =
+      type === "increase" ? item.quantity + 1 : item.quantity - 1;
+    dispatch(
+      UpdatedCartItem({
+        userId: user?.id,
+        productId: item?.productId,
+        quantity,
+      })
+    ).then((data) => {
+      if (data.payload.success) {
+        toast({
+          description: "Cart Updated Successfully",
+        });
+        dispatch(getCartItem(user?.id));
+      }
+    });
+  };
   return (
     <SheetContent className="max-w-sm overflow-auto">
       <SheetHeader>
@@ -18,7 +41,11 @@ export default function UserCartWrapper({ cart }) {
       <SheetDescription />
       <div className="mt-8 space-y-4">
         {cart?.map((item) => (
-          <UserCartItemsContent key={item.productId} item={item} />
+          <UserCartItemsContent
+            key={item.productId}
+            item={item}
+            handleCartItem={handleCartItem}
+          />
         ))}
       </div>
       {/* <Separator className="space-y-4 my-5" /> */}
