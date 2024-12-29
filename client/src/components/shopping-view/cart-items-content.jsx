@@ -10,24 +10,15 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "@/hooks/use-toast";
 
-export default function UserCartItemsContent({ item, handleCartItem }) {
+export default function UserCartItemsContent({
+  item,
+  handleCartItem,
+  deleteCart,
+}) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const totalPrice =
     (item.salePrice ? item.salePrice : item.price) * item.quantity;
-
-  const deleteCart = (item) => {
-    dispatch(
-      deletCartItems({ userId: user?.id, productId: item?.productId })
-    ).then((data) => {
-      if (data.payload.success) {
-        toast({
-          description: "Product Deleted Successfully",
-        });
-        dispatch(getCartItem(user?.id));
-      }
-    });
-  };
 
   return (
     <div className="flex space-x-4 items-start">

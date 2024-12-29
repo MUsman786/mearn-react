@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   SheetContent,
   SheetDescription,
@@ -9,13 +9,20 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import UserCartItemsContent from "./cart-items-content";
 import { useDispatch, useSelector } from "react-redux";
-import { getCartItem, UpdatedCartItem } from "@/store/shop/cart-slice";
+import {
+  deletCartItems,
+  getCartItem,
+  UpdatedCartItem,
+} from "@/store/shop/cart-slice";
 import { toast } from "@/hooks/use-toast";
 
 export default function UserCartWrapper({ cart }) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(false);
+
   const handleCartItem = (item, type) => {
+    setLoading(true);
     const quantity =
       type === "increase" ? item.quantity + 1 : item.quantity - 1;
     dispatch(
@@ -29,7 +36,28 @@ export default function UserCartWrapper({ cart }) {
         toast({
           description: "Cart Updated Successfully",
         });
-        dispatch(getCartItem(user?.id));
+        dispatch(getCartItem(user?.id)).then(() => {
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
+      }
+    });
+  };
+  const deleteCart = (item) => {
+    setLoading(true);
+    dispatch(
+      deletCartItems({ userId: user?.id, productId: item?.productId })
+    ).then((data) => {
+      if (data.payload.success) {
+        toast({
+          description: "Product Deleted Successfully",
+        });
+        dispatch(getCartItem(user?.id)).then(() => {
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
       }
     });
   };
@@ -39,21 +67,32 @@ export default function UserCartWrapper({ cart }) {
         <SheetTitle>Cart</SheetTitle>
       </SheetHeader>
       <SheetDescription />
-      <div className="mt-8 space-y-4">
-        {cart?.map((item) => (
-          <UserCartItemsContent
-            key={item.productId}
-            item={item}
-            handleCartItem={handleCartItem}
-          />
-        ))}
-      </div>
-      {/* <Separator className="space-y-4 my-5" /> */}
-      <div className="mt-8 space-y-4 flex justify-between">
-        <span className="font-bold">Total</span>
-        <span className="font-bold">$1000</span>
-      </div>
-      <Button className="w-full mt-5">Checkout</Button>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <span>Loading...</span>
+        </div>
+      ) : (
+        <>
+          <div className="mt-8 space-y-4">
+            {cart &&
+              cart.length > 0 &&
+              cart?.map((item) => (
+                <UserCartItemsContent
+                  key={item.productId}
+                  item={item}
+                  handleCartItem={handleCartItem}
+                  deleteCart={deleteCart}
+                />
+              ))}
+          </div>
+          {/* <Separator className="space-y-4 my-5" /> */}
+          <div className="mt-8 space-y-4 flex justify-between">
+            <span className="font-bold">Total</span>
+            <span className="font-bold">$1000</span>
+          </div>
+          <Button className="w-full mt-5">Checkout</Button>
+        </>
+      )}
     </SheetContent>
   );
 }
