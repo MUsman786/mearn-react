@@ -6,8 +6,25 @@ import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { StarIcon } from "lucide-react";
 import { Input } from "../ui/input";
+import { addCartItem, getCartItem } from "@/store/shop/cart-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "@/hooks/use-toast";
 
 export default function ProductDetailsDailog({ open, setOpen, productDetail }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const handelCardProduct = (productId) => {
+    dispatch(addCartItem({ userId: user?.id, productId, quantity: 1 })).then(
+      (data) => {
+        if (data.payload.success) {
+          dispatch(getCartItem(user?.id));
+          toast({
+            description: "Product Add Successfully",
+          });
+        }
+      }
+    );
+  };
   return (
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -53,7 +70,14 @@ export default function ProductDetailsDailog({ open, setOpen, productDetail }) {
               <span className="text-muted-foreground">(4.5)</span>
             </div>
             <div className="my-6">
-              <Button className="w-full">Add to Cart</Button>
+              <Button
+                className="w-full"
+                onClick={() => {
+                  handelCardProduct(productDetail?._id);
+                }}
+              >
+                Add to Cart
+              </Button>
             </div>
             <Separator />
             <div className="max-h-[300px] overflow-auto  p-3">

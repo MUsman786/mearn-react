@@ -13,6 +13,7 @@ import { sortOptions } from "@/components/common/config";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearProductDetail,
   fetchAllFilteredProducts,
   fetchSingleProduct,
 } from "@/store/shop/product-slice";
@@ -104,6 +105,10 @@ export default function ShoppingList() {
   const handelProductDetail = (id) => {
     dispatch(fetchSingleProduct(id));
   };
+  const handelProductDetailModal = () => {
+    setOpenDetailDilog(false);
+    dispatch(clearProductDetail());
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
@@ -158,7 +163,7 @@ export default function ShoppingList() {
       {productDetail?._id && (
         <ProductDetailsDailog
           open={openDetailDilog}
-          setOpen={setOpenDetailDilog}
+          setOpen={handelProductDetailModal}
           productDetail={productDetail}
         />
       )}
